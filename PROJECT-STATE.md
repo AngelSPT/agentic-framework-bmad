@@ -19,7 +19,8 @@
 | 6 | CLI bin/agf | completada | commit 9e2d3e6, 13 tests |
 | 7 | install.sh idempotente | completada | commit 2b4368b, 10 tests |
 | 8 | README | completada | commit 38c366f |
-| 9 | Piloto 1: comprobación de instalación + prueba de ciclo completo | pendiente | ver "Bloqueos" |
+| 9a | Comprobación de instalación (sandbox, BMAD real) | completada | 2026-07-17, ver "Última sesión" |
+| 9b | Piloto 1: ciclo completo en proyecto real | pendiente | ver "Bloqueos" |
 
 ## Supuestos tomados por las personas
 
@@ -27,18 +28,14 @@
 
 ## Bloqueos
 
-- **Story 9 pendiente de validación real (Task 9 del plan).** La suite de tests
-  pasa (36/36) pero el framework NO está validado end-to-end. Falta:
-  1. **Comprobación de instalación**: correr `./install.sh` sobre un proyecto
-     piloto real (`pruebas` o `social-media-content-generator`, a decisión de
-     Angel) y verificar que el instalador de BMAD termina bien, que existen
-     `PROJECT-STATE.md`, el snippet en `CLAUDE.md` y el hook Stop en
-     `.claude/settings.json`, y que el proyecto aparece en `agf status`.
-  2. **Prueba piloto**: correr una feature real pequeña por el ciclo completo
-     (PRD → arquitectura → stories → implementación → QA) y registrar las 4
-     métricas del spec: ¿terminó sin intervención?, cuota consumida,
-     ¿respetó la arquitectura?, ¿retomar costó < 2 min?
-  - Requiere input de Angel (elegir proyecto y feature) y red (instala BMAD).
+- **Story 9b pendiente: prueba piloto en proyecto real.** La instalación ya
+  está validada en sandbox (Story 9a), pero falta correr una feature real
+  pequeña por el ciclo completo (PRD → arquitectura → stories →
+  implementación → QA) y registrar las 4 métricas del spec: ¿terminó sin
+  intervención?, cuota consumida, ¿respetó la arquitectura?, ¿retomar
+  costó < 2 min?
+  - Requiere input de Angel: elegir proyecto piloto (`pruebas` o
+    `social-media-content-generator`) y la feature.
   - Tras el Piloto 1: Piloto 2 en `odoo-reylub`, y solo entonces rollout al
     resto de PROYECTOS. Detalle completo en
     `docs/superpowers/plans/2026-07-16-capa-orquestacion-agf.md` (Task 9).
@@ -51,8 +48,15 @@
 
 ## Última sesión
 
-- Fecha: 2026-07-16
-- Resumen: Tasks 1-8 del plan implementadas vía subagentes (TDD, 36 tests en
-  verde, HEAD 38c366f). jq 1.8.2 instalado en ~/.local/bin (sin sudo).
-- Siguiente paso: ejecutar la Story 9 (comprobación de instalación + prueba
-  piloto) cuando Angel elija proyecto y feature.
+- Fecha: 2026-07-17
+- Resumen: Story 9a completada — instalación validada end-to-end en un
+  sandbox git (scratchpad): `install.sh` con BMAD real v6.10.0 (46 skills),
+  PROJECT-STATE.md creado con nombre sustituido, snippet AGF en CLAUDE.md
+  (idempotente, 1 marcador tras 2ª pasada), hook Stop registrado en
+  `.claude/settings.json`, proyecto visible en `agf status`. Hooks probados
+  en vivo: Stop bloquea (exit 2) con tree sucio sin tocar estado y pasa al
+  actualizarlo; phase-gate bloquea `arquitectura` sin PRD y desbloquea con
+  él. Nota: un PROJECT-STATE.md sin trackear cuenta como "actualizado"
+  (aparece en porcelain) — comportamiento aceptado, solo aplica hasta el
+  primer commit tras instalar.
+- Siguiente paso: Story 9b (Piloto 1) cuando Angel elija proyecto y feature.
