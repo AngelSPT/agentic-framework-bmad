@@ -79,4 +79,18 @@ mkdir -p "$TMP/malo"
 AGF_SKIP_BMAD=1 bash "$INSTALL" "$TMP/malo" --runner cursor >/dev/null 2>&1
 assert_eq "1" "$?" "runner desconocido debe fallar"
 
+# 11. cambio de runner: reinstalar con el otro runner migra el bloque AGF
+mkdir -p "$TMP/cambio"
+AGF_SKIP_BMAD=1 bash "$INSTALL" "$TMP/cambio" >/dev/null 2>&1
+AGF_SKIP_BMAD=1 bash "$INSTALL" "$TMP/cambio" --runner antigravity >/dev/null 2>&1
+assert_eq "0" "$(grep -c 'AGF:BEGIN' "$TMP/cambio/CLAUDE.md")" \
+  "claude→agy: quita el bloque AGF de CLAUDE.md"
+assert_eq "1" "$(grep -c 'AGF:BEGIN' "$TMP/cambio/AGENTS.md")" \
+  "claude→agy: pone el bloque AGF en AGENTS.md"
+AGF_SKIP_BMAD=1 bash "$INSTALL" "$TMP/cambio" --runner claude >/dev/null 2>&1
+assert_eq "0" "$(grep -c 'AGF:BEGIN' "$TMP/cambio/AGENTS.md")" \
+  "agy→claude: quita el bloque AGF de AGENTS.md"
+assert_eq "1" "$(grep -c 'AGF:BEGIN' "$TMP/cambio/CLAUDE.md")" \
+  "agy→claude: pone el bloque AGF en CLAUDE.md"
+
 report

@@ -24,6 +24,7 @@ case "$RUNNER" in
     # Claude Code: reglas en CLAUDE.md, hook Stop en .claude/settings.json
     BMAD_TOOL="claude-code"
     RULES_FILE="CLAUDE.md"
+    OTHER_RULES_FILE="AGENTS.md"
     ;;
   antigravity)
     # Antigravity CLI (agy): lee AGENTS.md y hooks en .agents/. El tool ID de
@@ -31,6 +32,7 @@ case "$RUNNER" in
     # "antigravity" apunta a .agent/ (convención del IDE, no del CLI).
     BMAD_TOOL="gemini"
     RULES_FILE="AGENTS.md"
+    OTHER_RULES_FILE="CLAUDE.md"
     ;;
   *)
     echo "ERROR: runner desconocido '$RUNNER' (valores: claude, antigravity)" >&2
@@ -70,6 +72,15 @@ if ! grep -q 'AGF:BEGIN' "$RULES_MD" 2>/dev/null; then
     sed "s|<AGF_HOME>|$AGF_HOME|g" "$AGF_HOME/templates/CLAUDE-snippet.md"
   } >> "$RULES_MD"
   echo "actualizado: $RULES_FILE"
+fi
+
+# 3b. Cambio de runner: retirar el bloque AGF del archivo del otro runner
+#     (agf start decide el runner por dónde está el bloque, con AGENTS.md
+#     ganando; sin esta limpieza la conversión a claude no surtiría efecto).
+OTHER_MD="$TARGET/$OTHER_RULES_FILE"
+if grep -q 'AGF:BEGIN' "$OTHER_MD" 2>/dev/null; then
+  sed -i '/<!-- AGF:BEGIN/,/<!-- AGF:END -->/d' "$OTHER_MD"
+  echo "limpiado: bloque AGF retirado de $OTHER_RULES_FILE"
 fi
 
 # 4. Hook Stop, según el contrato de cada runner

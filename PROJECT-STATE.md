@@ -22,6 +22,7 @@
 | 9a | Comprobación de instalación (sandbox, BMAD real) | completada | 2026-07-17, ver "Última sesión" |
 | 9b | Piloto 1: ciclo completo en proyecto real | completada | 2026-07-17, vps-setup (greenfield) — funcionó sin intervención; consumo de cuota alto |
 | 10 | Runner Antigravity CLI (agy) por proyecto | completada | 2026-07-17, 20 tests nuevos (56 total); pendiente piloto en vps-setup |
+| 11 | Cambio de runner en un comando + GUIA.md | completada | 2026-07-17, 4 tests nuevos (60 total) |
 
 ## Supuestos tomados por las personas
 
@@ -71,5 +72,8 @@
   `hooks/update-state-agy.sh` (contrato agy: exit 0 + JSON allow/deny),
   `agf start` detecta el runner por proyecto, `install.sh` crea el symlink
   de agf. Suite: 56 tests en verde.
+- Actualización 2026-07-17 (3): Story 11 — cambiar de runner es un solo
+  comando (`install.sh <dir> --runner X` retira el bloque AGF del archivo
+  del otro runner) y `GUIA.md` documenta el uso diario completo. 60 tests.
 - Siguiente paso: piloto del runner agy en `vps-setup` (segunda feature) y
   Piloto 2 en `odoo-reylub`.

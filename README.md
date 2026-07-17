@@ -2,6 +2,7 @@
 
 Capa mínima de orquestación multi-proyecto para Claude Code sobre
 [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) oficial.
+Guía de uso diario: [`GUIA.md`](GUIA.md).
 Diseño completo: `docs/superpowers/specs/2026-07-16-bmad-adaptation-design.md`.
 
 ## Qué resuelve
