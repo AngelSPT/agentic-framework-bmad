@@ -25,8 +25,9 @@
   `PROJECT-STATE.md` → "Bloqueos" (story, motivo, qué se intentó) y termina la
   sesión. No reintentar a ciegas.
 
-## Frugalidad (cuota Claude Pro)
-- Modelo por defecto para personas del ciclo: Sonnet.
+## Frugalidad (cuota del plan)
+- Modelo por defecto para personas del ciclo: el económico del runner
+  (Sonnet en Claude Code; Gemini Flash en Antigravity).
 - Artefactos acotados: PRD ≤ ~2 páginas; arquitectura ≤ ~2 páginas; una story
   = una unidad implementable en una sesión corta.
 - Máximo 2 ciclos fire-and-forget simultáneos en toda la máquina (regla del

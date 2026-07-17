@@ -50,4 +50,19 @@ assert_contains "$ERR" "2 ciclos" "avisa la regla de máximo 2 ciclos"
 bash "$AGF" >/dev/null 2>&1
 assert_eq "1" "$?" "sin comando debe mostrar uso y fallar"
 
+# 7. runner por proyecto: AGENTS.md con marcador AGF -> agy; si no -> claude
+mkdir -p "$ROOT/proj-d"
+cat > "$ROOT/proj-d/PROJECT-STATE.md" <<'EOF'
+# Estado del proyecto — proj-d
+**Feature activa:** (ninguna)
+**Fase:** idea
+EOF
+echo '<!-- AGF:BEGIN -->reglas<!-- AGF:END -->' > "$ROOT/proj-d/AGENTS.md"
+OUT="$(AGF_ROOT="$ROOT" AGF_DRY_RUN=1 bash "$AGF" start proj-d 2>/dev/null)"
+assert_contains "$OUT" "agy" "proyecto con AGENTS.md AGF lanza agy"
+OUT="$(AGF_ROOT="$ROOT" AGF_DRY_RUN=1 bash "$AGF" start proj-a 2>/dev/null)"
+assert_contains "$OUT" "claude" "proyecto sin AGENTS.md AGF lanza claude"
+OUT="$(AGF_ROOT="$ROOT" AGF_DRY_RUN=1 bash "$AGF" start proj-a proj-d 2>/dev/null)"
+assert_contains "$OUT" "agy" "start mixto respeta el runner de cada proyecto"
+
 report

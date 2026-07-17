@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# agf — launcher y monitor multi-proyecto para Claude Code + BMAD.
+# agf — launcher y monitor multi-proyecto para Claude Code / Antigravity + BMAD.
 #
 # Comandos:
-#   agf start <proyecto...>  abre una ventana tmux por proyecto corriendo claude
+#   agf start <proyecto...>  una ventana tmux por proyecto con su runner (claude|agy)
 #   agf status               fase y feature de cada proyecto (lee PROJECT-STATE.md)
 #   agf list                 proyectos con el framework instalado
 #
@@ -32,6 +32,16 @@ session_exists() {
   command tmux has-session -t "$SESSION" 2>/dev/null
 }
 
+runner_for() { # $1=dir del proyecto → comando a lanzar
+  # El runner se decide en la instalación: install.sh --runner antigravity
+  # escribe las reglas AGF en AGENTS.md; el runner claude las deja en CLAUDE.md.
+  if grep -q 'AGF:BEGIN' "$1/AGENTS.md" 2>/dev/null; then
+    echo "agy"
+  else
+    echo "claude"
+  fi
+}
+
 cmd_start() {
   [[ $# -ge 1 ]] || { echo "uso: agf start <proyecto...>" >&2; return 1; }
 
@@ -47,11 +57,13 @@ cmd_start() {
   done
 
   if ! session_exists; then
-    tmux_run new-session -d -s "$SESSION" -n "$1" -c "$AGF_ROOT/$1" claude
+    tmux_run new-session -d -s "$SESSION" -n "$1" -c "$AGF_ROOT/$1" \
+      "$(runner_for "$AGF_ROOT/$1")"
     shift
   fi
   for p in "$@"; do
-    tmux_run new-window -t "$SESSION" -n "$p" -c "$AGF_ROOT/$p" claude
+    tmux_run new-window -t "$SESSION" -n "$p" -c "$AGF_ROOT/$p" \
+      "$(runner_for "$AGF_ROOT/$p")"
   done
 
   [[ "$DRY" == "1" ]] || tmux_run attach -t "$SESSION"

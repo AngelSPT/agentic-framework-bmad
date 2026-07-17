@@ -13,13 +13,20 @@ Claude Code por proyecto, memoria persistente en archivos
 ## Instalación en un proyecto
 
 ```bash
-./install.sh ~/PROYECTOS/mi-proyecto
+./install.sh ~/PROYECTOS/mi-proyecto                        # runner Claude Code
+./install.sh ~/PROYECTOS/mi-proyecto --runner antigravity   # runner Antigravity CLI
 ```
 
-Hace 4 cosas (idempotente): instala BMAD (módulo BMM, tool claude-code),
-copia `PROJECT-STATE.md`, añade las reglas AGF al `CLAUDE.md` del proyecto y
-registra el hook Stop en `.claude/settings.json`. Requiere `jq` y
-`pnpm` (o `npx`).
+Hace 5 cosas (idempotente): instala BMAD (módulo BMM, tool según runner),
+copia `PROJECT-STATE.md`, añade las reglas AGF al archivo de contexto del
+runner (`CLAUDE.md` o `AGENTS.md`), registra el hook Stop
+(`.claude/settings.json` o `.agents/hooks.json`) y enlaza `agf` en
+`~/.local/bin`. Requiere `jq` y `pnpm` (o `npx`).
+
+Cada proyecto usa **un solo runner**, elegido al instalar; `agf start` lanza
+`claude` o `agy` según dónde estén las reglas AGF. Para el runner antigravity
+hace falta [Antigravity CLI](https://github.com/google-antigravity/antigravity-cli)
+instalado y logueado (cuota Google, separada de la de Claude).
 
 ## Uso diario
 
@@ -29,13 +36,9 @@ agf status                      # fase y feature de cada proyecto (cero tokens)
 agf list                        # proyectos con el framework instalado
 ```
 
-Regla de cuota Pro: **máximo 2 ciclos fire-and-forget simultáneos.**
-
-Para usar `agf` desde cualquier lugar:
-
-```bash
-ln -s "$(pwd)/bin/agf" ~/.local/bin/agf
-```
+Regla de cuota Pro: **máximo 2 ciclos fire-and-forget simultáneos** por
+plan (los ciclos en Antigravity consumen cuota Google, no cuentan contra
+Claude Pro).
 
 ## Componentes
 
@@ -46,6 +49,7 @@ ln -s "$(pwd)/bin/agf" ~/.local/bin/agf
 | `templates/CLAUDE-snippet.md` | Reglas del ciclo BMAD adaptado (frugalidad Pro) |
 | `hooks/phase-gate.sh` | Bloquea fases sin artefacto previo (falla cerrado) |
 | `hooks/update-state.sh` | Hook Stop: exige `PROJECT-STATE.md` al día |
+| `hooks/update-state-agy.sh` | Adaptador del hook Stop al contrato de Antigravity |
 | `install.sh` | Bootstrap idempotente de todo lo anterior |
 
 ## Tests

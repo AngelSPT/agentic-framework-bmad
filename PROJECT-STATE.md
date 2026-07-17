@@ -21,6 +21,7 @@
 | 8 | README | completada | commit 38c366f |
 | 9a | Comprobación de instalación (sandbox, BMAD real) | completada | 2026-07-17, ver "Última sesión" |
 | 9b | Piloto 1: ciclo completo en proyecto real | completada | 2026-07-17, vps-setup (greenfield) — funcionó sin intervención; consumo de cuota alto |
+| 10 | Runner Antigravity CLI (agy) por proyecto | completada | 2026-07-17, 20 tests nuevos (56 total); pendiente piloto en vps-setup |
 
 ## Supuestos tomados por las personas
 
@@ -31,9 +32,15 @@
 - Piloto 2 pendiente en `odoo-reylub` (proyecto brownfield real); solo tras
   ese piloto hacer rollout al resto de PROYECTOS. Detalle en
   `docs/superpowers/plans/2026-07-16-capa-orquestacion-agf.md` (Task 9).
-- Fricción detectada en Piloto 1: `agf` no estaba en PATH (paso manual del
-  README). Resuelto con symlink en `~/.local/bin`; mejora candidata:
-  que `install.sh` cree el symlink.
+- Piloto del runner Antigravity pendiente en `vps-setup` (segunda feature,
+  convirtiendo el proyecto de claude a agy). Verificar en ese piloto:
+  (a) que `agy` lee el snippet de `AGENTS.md` y los skills BMAD instalados
+  con el tool ID `gemini` (`.agents/skills`) — si no, probar el ID
+  `antigravity` (`.agent/skills`); (b) que el hook Stop en
+  `.agents/hooks.json` bloquea de verdad con `{"decision":"deny"}` (el
+  contrato se tomó de docs de terceros, no está probado en vivo); (c) al
+  convertir, quitar a mano el bloque AGF de `CLAUDE.md` si se quiere que
+  `agf start` no tenga ambigüedad (AGENTS.md tiene prioridad de todos modos).
 
 ## Métricas del ciclo
 
@@ -58,5 +65,11 @@
 - Actualización 2026-07-17 (tarde): Piloto 1 completado en `vps-setup`
   (proyecto greenfield elegido por Angel). Funcionó "a la perfección" sin
   intervención; consumo de cuota alto. Symlink `agf` creado en ~/.local/bin.
-- Siguiente paso: Piloto 2 en `odoo-reylub`; en paralelo, evaluar soporte
-  para Antigravity CLI como segundo runner (petición de Angel).
+- Actualización 2026-07-17 (2): Story 10 implementada — runner Antigravity
+  por proyecto: `install.sh --runner antigravity` (BMAD tool `gemini`,
+  snippet en AGENTS.md, hook Stop adaptado en `.agents/hooks.json`),
+  `hooks/update-state-agy.sh` (contrato agy: exit 0 + JSON allow/deny),
+  `agf start` detecta el runner por proyecto, `install.sh` crea el symlink
+  de agf. Suite: 56 tests en verde.
+- Siguiente paso: piloto del runner agy en `vps-setup` (segunda feature) y
+  Piloto 2 en `odoo-reylub`.
