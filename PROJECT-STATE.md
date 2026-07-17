@@ -20,7 +20,7 @@
 | 7 | install.sh idempotente | completada | commit 2b4368b, 10 tests |
 | 8 | README | completada | commit 38c366f |
 | 9a | Comprobación de instalación (sandbox, BMAD real) | completada | 2026-07-17, ver "Última sesión" |
-| 9b | Piloto 1: ciclo completo en proyecto real | pendiente | ver "Bloqueos" |
+| 9b | Piloto 1: ciclo completo en proyecto real | completada | 2026-07-17, vps-setup (greenfield) — funcionó sin intervención; consumo de cuota alto |
 
 ## Supuestos tomados por las personas
 
@@ -28,23 +28,19 @@
 
 ## Bloqueos
 
-- **Story 9b pendiente: prueba piloto en proyecto real.** La instalación ya
-  está validada en sandbox (Story 9a), pero falta correr una feature real
-  pequeña por el ciclo completo (PRD → arquitectura → stories →
-  implementación → QA) y registrar las 4 métricas del spec: ¿terminó sin
-  intervención?, cuota consumida, ¿respetó la arquitectura?, ¿retomar
-  costó < 2 min?
-  - Requiere input de Angel: elegir proyecto piloto (`pruebas` o
-    `social-media-content-generator`) y la feature.
-  - Tras el Piloto 1: Piloto 2 en `odoo-reylub`, y solo entonces rollout al
-    resto de PROYECTOS. Detalle completo en
-    `docs/superpowers/plans/2026-07-16-capa-orquestacion-agf.md` (Task 9).
+- Piloto 2 pendiente en `odoo-reylub` (proyecto brownfield real); solo tras
+  ese piloto hacer rollout al resto de PROYECTOS. Detalle en
+  `docs/superpowers/plans/2026-07-16-capa-orquestacion-agf.md` (Task 9).
+- Fricción detectada en Piloto 1: `agf` no estaba en PATH (paso manual del
+  README). Resuelto con symlink en `~/.local/bin`; mejora candidata:
+  que `install.sh` cree el symlink.
 
 ## Métricas del ciclo
 
-- Ciclos completados sin intervención: 0 (aún sin piloto)
+- Ciclos completados sin intervención: 1 (Piloto 1 en vps-setup, greenfield)
 - Stories rechazadas por QA: 0
-- Notas de consumo de cuota: —
+- Notas de consumo de cuota: Piloto 1 consumió mucha cuota Pro (esperado por
+  la autonomía del ciclo); evaluar mitigaciones antes del rollout
 
 ## Última sesión
 
@@ -59,4 +55,8 @@
   él. Nota: un PROJECT-STATE.md sin trackear cuenta como "actualizado"
   (aparece en porcelain) — comportamiento aceptado, solo aplica hasta el
   primer commit tras instalar.
-- Siguiente paso: Story 9b (Piloto 1) cuando Angel elija proyecto y feature.
+- Actualización 2026-07-17 (tarde): Piloto 1 completado en `vps-setup`
+  (proyecto greenfield elegido por Angel). Funcionó "a la perfección" sin
+  intervención; consumo de cuota alto. Symlink `agf` creado en ~/.local/bin.
+- Siguiente paso: Piloto 2 en `odoo-reylub`; en paralelo, evaluar soporte
+  para Antigravity CLI como segundo runner (petición de Angel).
