@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# agf — launcher y monitor multi-proyecto para Claude Code + BMAD.
+#
+# Comandos:
+#   agf start <proyecto...>  abre una ventana tmux por proyecto corriendo claude
+#   agf status               fase y feature de cada proyecto (lee PROJECT-STATE.md)
+#   agf list                 proyectos con el framework instalado
+#
+# Config por entorno:
+#   AGF_ROOT     raíz de proyectos (default: $HOME/PROYECTOS)
+#   AGF_DRY_RUN  =1 imprime los comandos tmux en vez de ejecutarlos
+set -u
+
+AGF_ROOT="${AGF_ROOT:-$HOME/PROYECTOS}"
+SESSION="agf"
+DRY="${AGF_DRY_RUN:-0}"
+
+usage() {
+  sed -n '2,11p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+}
+
+tmux_run() {
+  if [[ "$DRY" == "1" ]]; then
+    echo "tmux $*"
+  else
+    command tmux "$@"
+  fi
+}
+
+session_exists() {
+  [[ "$DRY" == "1" ]] && return 1
+  command tmux has-session -t "$SESSION" 2>/dev/null
+}
+
+cmd_start() {
+  [[ $# -ge 1 ]] || { echo "uso: agf start <proyecto...>" >&2; return 1; }
+
+  if [[ $# -gt 2 ]]; then
+    echo "AVISO: regla de cuota Pro — máximo 2 ciclos fire-and-forget" >&2
+    echo "simultáneos. Se abren $# ventanas; no dispares más de 2 ciclos." >&2
+  fi
+
+  local p dir
+  for p in "$@"; do
+    dir="$AGF_ROOT/$p"
+    [[ -d "$dir" ]] || { echo "ERROR: no existe $dir" >&2; return 1; }
+  done
+
+  if ! session_exists; then
+    tmux_run new-session -d -s "$SESSION" -n "$1" -c "$AGF_ROOT/$1" claude
+    shift
+  fi
+  for p in "$@"; do
+    tmux_run new-window -t "$SESSION" -n "$p" -c "$AGF_ROOT/$p" claude
+  done
+
+  [[ "$DRY" == "1" ]] || tmux_run attach -t "$SESSION"
+}
+
+cmd_status() {
+  local f proj fase feat found=0
+  printf "%-32s %-16s %s\n" "PROYECTO" "FASE" "FEATURE"
+  for f in "$AGF_ROOT"/*/PROJECT-STATE.md; do
+    [[ -f "$f" ]] || continue
+    found=1
+    proj="$(basename "$(dirname "$f")")"
+    fase="$(sed -n 's/^\*\*Fase:\*\* //p' "$f" | head -1)"
+    feat="$(sed -n 's/^\*\*Feature activa:\*\* //p' "$f" | head -1)"
+    printf "%-32s %-16s %s\n" "$proj" "${fase:-?}" "${feat:-?}"
+  done
+  [[ $found -eq 1 ]] || echo "(ningún proyecto con PROJECT-STATE.md en $AGF_ROOT)"
+}
+
+cmd_list() {
+  local f found=0
+  for f in "$AGF_ROOT"/*/PROJECT-STATE.md; do
+    [[ -f "$f" ]] || continue
+    found=1
+    basename "$(dirname "$f")"
+  done
+  [[ $found -eq 1 ]] || echo "(ninguno)"
+}
+
+case "${1:-}" in
+  start)  shift; cmd_start "$@" ;;
+  status) cmd_status ;;
+  list)   cmd_list ;;
+  *)      usage; exit 1 ;;
+esac
