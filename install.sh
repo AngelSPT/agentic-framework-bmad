@@ -41,11 +41,16 @@ esac
 command -v jq >/dev/null 2>&1 || { echo "ERROR: se requiere jq" >&2; exit 1; }
 
 # 1. BMAD-METHOD oficial (pnpm preferido sobre npm/npx)
+#    Sobre una instalación BMAD existente el default es quick-update, que
+#    conserva los tools previos e ignora --tools: forzar --action update para
+#    que una conversión de runner añada el tool nuevo.
 if [[ "${AGF_SKIP_BMAD:-0}" != "1" ]]; then
+  BMAD_ACTION=()
+  [[ -d "$TARGET/_bmad" ]] && BMAD_ACTION=(--action update)
   if command -v pnpm >/dev/null 2>&1; then
-    pnpm dlx bmad-method install --directory "$TARGET" --modules bmm --tools "$BMAD_TOOL" --yes
+    pnpm dlx bmad-method install --directory "$TARGET" --modules bmm --tools "$BMAD_TOOL" "${BMAD_ACTION[@]}" --yes
   else
-    npx bmad-method install --directory "$TARGET" --modules bmm --tools "$BMAD_TOOL" --yes
+    npx bmad-method install --directory "$TARGET" --modules bmm --tools "$BMAD_TOOL" "${BMAD_ACTION[@]}" --yes
   fi
 fi
 
