@@ -59,11 +59,3 @@ Claude Pro).
 tests/run-tests.sh
 ```
 
-## Estado actual
-
-La implementación está completa y la suite pasa (36 tests), pero el framework
-**aún no está validado end-to-end**: falta la comprobación de instalación
-sobre un proyecto real y la prueba piloto del ciclo completo con sus 4
-métricas. El detalle vive en [`PROJECT-STATE.md`](PROJECT-STATE.md) (Story 9)
-y en la Task 9 del plan de implementación. No hacer rollout al resto de
-proyectos antes de cerrar esa validación.
